@@ -1,0 +1,25 @@
+- name: Update apt repositories cache
+  become: true
+  apt:
+    update_cache: yes
+
+- name: Install packages
+  become: true
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+    - net-tools
+    - bash-completion
+    - git
+    - vim
+
+- name: Set vim as editor
+  become: true
+  alternatives:
+    name: editor
+    path: /usr/bin/vim.basic

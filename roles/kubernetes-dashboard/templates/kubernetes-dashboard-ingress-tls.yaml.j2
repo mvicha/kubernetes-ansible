@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/tls
+metadata:
+  name: kubernetes-dashboard-ingress-tls
+  namespace: kube-system
+data:
+  tls.crt: {{ selfsignedcrt.stdout | b64encode }}
+  tls.key: {{ selfsignedkey.stdout | b64encode }}
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    ingress.kubernetes.io/ssl-passthrough: "true"
+    nginx.org/ssl-backends: "kubernetes-dashboard"
+    kubernetes.io/ingress.allow-http: "false"
+    nginx.ingress.kubernetes.io/secure-backends: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      rewrite ^(/dashboard)$ $1/ permanent;
+  name: kubernetes-dashboard-ingress
+  namespace: kube-system
+spec:
+  tls:
+  - hosts:
+    - {{ hostvars['master1']['inventory_hostname'] }}
+    secretName: kubernetes-dashboard-ingress-tls
+  rules:
+  - host: {{ hostvars['master1']['inventory_hostname'] }}
+    http:
+      paths:
+      - path: /dashboard/?(.*)
+        backend:
+          serviceName: kubernetes-dashboard
+          servicePort: 443

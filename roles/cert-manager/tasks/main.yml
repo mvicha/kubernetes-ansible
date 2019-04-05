@@ -1,0 +1,8 @@
+- name: Create cert-manager namespace
+  shell: kubectl create namespace cert-manager
+
+- name: Label cert-manager namespace
+  shell: kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true
+
+- name: Install cert-manager
+  shell: kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.7/deploy/manifests/cert-manager.yaml

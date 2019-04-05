@@ -1,0 +1,43 @@
+- name: Install kubernetes-dashboard
+  shell: kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/kubernetes-dashboard.yaml
+
+- name: Grant permissions to kubernetes-dashboard to access other namespaces
+  shell: kubectl create clusterrolebinding kubernetes-dashboard --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard
+
+- name: Create SSL certificate
+  shell: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx-selfsigned.key -out nginx-selfsigned.crt -subj "/CN={{ ansible_host }}/O=Ciklum Digital"
+
+- name: Save selfsignedcrt
+  shell: cat nginx-selfsigned.crt
+  register: selfsignedcrt
+
+- name: Remove nginx-selfsigned.crt
+  file:
+    path: ./nginx-selfsigned.crt
+    state: absent
+
+- name: Save selfsignedkey
+  shell: cat nginx-selfsigned.key
+  register: selfsignedkey
+
+- name: Remove nginx-selfsigned.key
+  file:
+    path: ./nginx-selfsigned.key
+    state: absent
+
+- name: Copy kubernetes-dashboard-ingress-tls.yaml
+  template:
+    src: kubernetes-dashboard-ingress-tls.yaml.j2
+    dest: kubernetes-dashboard-ingress-tls.yaml
+
+- name: Apply kubernetes-dashboard-ingress-tls.yaml
+  shell: kubectl apply -f kubernetes-dashboard-ingress-tls.yaml
+
+- name: Remove kubernetes-dashboard-ingress-tls.yaml
+  file:
+    path: ./kubernetes-dashboard-ingress-tls.yaml
+    state: absent
+
+- name: Get kubernetes-dashboard token
+  shell: kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep kubernetes-dashboard | awk '{print $1}') | grep "^token:"
+  register: kubernetes-dashboard-token

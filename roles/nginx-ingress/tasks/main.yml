@@ -1,0 +1,10 @@
+- name: Wait 2 minutes for tiller pod to get ready
+  pause:
+    minutes: 2
+
+- name: Install nginx-ingress using Helm
+  shell: helm install stable/nginx-ingress --name my-nginx --set rbac.create=true
+
+- name: Update nginx-ingress LoadBalancer
+  shell: kubectl patch service my-nginx-nginx-ingress-controller -p '{"spec":{"externalIPs":["{{ ansible_host }}"]}}'
+

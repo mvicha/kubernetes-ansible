@@ -1,0 +1,59 @@
+- name: Add apt key
+  become: true
+  apt_key:
+    url: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
+    state: present
+
+- name: Copy /etc/apt/sources.list.d/kubernetes.list
+  become: true
+  copy:
+    src: kubernetes.list
+    dest: /etc/apt/sources.list.d/kubernetes.list
+
+- name: Update apt repositories cache
+  become: true
+  apt:
+    update_cache: yes
+
+- name: Install Kubernetes
+  become: true
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - kubelet
+    - kubeadm
+    - kubectl
+
+- name: Set kubernetes packages on hold
+  become: true
+  command: apt-mark hold kubelet kubeadm kubectl
+
+- name: Turn swap off
+  become: true
+  shell: |
+    swapoff -a
+
+- name: Disable swap
+  become: true
+  replace:
+    path: /etc/fstab
+    regexp: '^(.+?\sswap\s+sw\s+.*)$'
+    replace: '# \1'
+
+- name: Copy /etc/default/kubelet
+  become: true
+  template:
+    src: kubelet.j2
+    dest: /etc/default/kubelet
+
+- name: Restart kubelet
+  become: true
+  systemd:
+    name: kubelet
+    state: restarted
+    daemon_reload: yes
+
+- name: Set bash completion for kubernetes
+  become: true
+  shell: kubectl completion bash > /etc/bash_completion.d/kubectl

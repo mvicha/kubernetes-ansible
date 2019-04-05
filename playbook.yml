@@ -1,0 +1,25 @@
+- hosts: all
+  gather_facts: true
+  roles:
+    - basic
+    - docker
+    - kubernetes
+
+- hosts: kubemasters
+  gather_facts: true
+  roles:
+    - kubemasters
+
+- hosts: kubenodes
+  gather_facts: true
+  roles:
+    - kubenodes
+
+- hosts: kubemasters
+  gather_facts: true
+  roles:
+    - helm
+    - cert-manager
+    - metrics-server
+    - nginx-ingress
+    - kubernetes-dashboard

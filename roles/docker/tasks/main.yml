@@ -1,0 +1,20 @@
+- name: Download Docker installation script
+  get_url:
+    url: https://get.docker.com
+    dest: ./get.docker.sh
+
+- name: Install Docker
+  shell: sh ./get.docker.sh
+
+- name: Remove Docker installation script
+  file:
+    path: ./get.docker.sh
+    state: absent
+
+- name: Add {{ ansible_user }} to docker group
+  become: true
+  user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
+

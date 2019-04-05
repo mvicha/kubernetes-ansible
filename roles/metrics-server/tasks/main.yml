@@ -1,0 +1,25 @@
+- name: Get metrics-server repo
+  git:
+    repo: "https://github.com/kubernetes-incubator/metrics-server.git"
+    dest: metrics-server
+
+- name: Update metrics-server/deploy/1.8+/metrics-server-deployment.yaml
+  lineinfile:
+    dest: metrics-server/deploy/1.8+/metrics-server-deployment.yaml
+    line: "{{ item }}"
+    state: present
+  with_items:
+    - "        command:"
+    - "          - /metrics-server"
+    - "          - --v=2"
+    - "          - --kubelet-insecure-tls"
+    - "          - --kubelet-preferred-address-types=InternalIP"
+
+- name: Apply metrics-server manifest
+  shell: kubectl apply -f metrics-server/deploy/1.8+/
+
+- name: Remove metrics-server repo
+  file:
+    path: ./metrics-server
+    state: absent
+

@@ -1,0 +1,13 @@
+master1 ansible_host=192.168.122.254 ansible_port=22 ansible_user=mvilla
+node1 ansible_host=192.168.122.2 ansible_port=22 ansible_user=ssh_username
+node2 ansible_host=192.168.122.3 ansible_port=22 ansible_user=ssh_username
+node3 ansible_host=192.168.122.4 ansible_port=22 ansible_user=ssh_username
+
+[kubemasters]
+master1
+
+[kubenodes]
+node1
+node2
+node3
+
