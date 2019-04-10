@@ -28,10 +28,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ hostvars['master1']['inventory_hostname'] }}
+    - {{ hostvars['kubemaster']['inventory_hostname'] }}
     secretName: kubernetes-dashboard-ingress-tls
   rules:
-  - host: {{ hostvars['master1']['inventory_hostname'] }}
+  - host: {{ hostvars['kubemaster']['inventory_hostname'] }}
     http:
       paths:
       - path: /dashboard/?(.*)

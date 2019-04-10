@@ -40,4 +40,5 @@
 
 - name: Get kubernetes-dashboard token
   shell: kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep kubernetes-dashboard | awk '{print $1}') | grep "^token:"
-  register: kubernetes-dashboard-token
+#  register: kubernetes-dashboard-token
+

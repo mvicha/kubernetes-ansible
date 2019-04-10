@@ -1,4 +1,4 @@
 - name: Join Cluster
   become: true
-  shell: "{{ hostvars['master1']['kubernetes_join_command'] }}"
+  shell: "{{ hostvars['kubemaster']['kubernetes_join_command'] }}"
 
